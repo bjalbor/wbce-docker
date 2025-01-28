@@ -19,7 +19,8 @@ RUN docker-php-ext-install mysqli && \
 RUN curl -o /wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
 RUN chmod +x /wait-for-it.sh
 
-COPY --chmod=0755 docker-entrypoint.sh /
+COPY docker-entrypoint.sh /
+RUN chmod 755 /docker-entrypoint.sh
 COPY save.patch /
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
