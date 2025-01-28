@@ -1,0 +1,48 @@
+*** install/save.php.orig	Tue Jan 28 13:29:33 2025
+--- install/save.php	Tue Jan 28 13:26:13 2025
+***************
+*** 241,247 ****
+      // To see debug output , just uncomment the Location header
+      // echo "<h4>Called Error</4>";
+      header('Location: index.php?sessions_checked=true');
+!     exit;
+  }
+  
+  // extract port if available
+--- 241,248 ----
+      // To see debug output , just uncomment the Location header
+      // echo "<h4>Called Error</4>";
+      header('Location: index.php?sessions_checked=true');
+!     if (isset($_SESSION['message'])) var_export($_SESSION['message']);
+!     exit (100);
+  }
+  
+  // extract port if available
+***************
+*** 280,285 ****
+--- 281,287 ----
+      $sMsg = d('e29: ') . 'Cannot connect to Database. Check host name, username, DB name and password.<br />Error:<br />'
+          . $e->getMessage() . "Host: database_host, User: $database_username, Pass: $database_password, DB-Name: $database_name, Port: $database_port";
+      // We end right here and dont collect any more errors
++     echo $sMsg; exit (100);
+      set_error($sMsg, "", true);
+  }
+  
+***************
+*** 424,430 ****
+  // Add  admin errors
+  if ($IsError) {
+      header('Location: index.php?sessions_checked=true');
+!     exit;
+  }
+  
+  /**********************
+--- 426,433 ----
+  // Add  admin errors
+  if ($IsError) {
+      header('Location: index.php?sessions_checked=true');
+!     if (isset($_SESSION['message'])) var_export($_SESSION['message']);
+!     exit (100);
+  }
+  
+  /**********************

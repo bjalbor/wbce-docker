@@ -1,0 +1,32 @@
+services:
+  wbce:
+    image: bjalbor/wbce:latest
+    networks:
+      - wbce
+    depends_on:
+      - mariadb
+    environment:
+      - WBCE_URL=http://example.org
+      - WBCE_ADMIN_PASSWORD=my_secret_key
+      - DATABASE_HOST=mariadb
+      - DATABASE_USERNAME=root
+      - DATABASE_PASSWORD=password-mariadb
+    volumes:
+      - ./public:/var/www/html
+    ports:
+      - 8000:80
+    
+  mariadb:
+    image: mariadb:latest
+    networks:
+      - wbce
+    volumes:
+      - ./db:/var/lib/mysql
+    environment:
+      - MARIADB_USER=wcbe
+      - MARIADB_PASSWORD=user-pw
+      - MARIADB_DATABASE=wbce
+      - MARIADB_ROOT_PASSWORD=password-mariadb
+    
+networks:
+  wbce:
