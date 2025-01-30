@@ -14,7 +14,7 @@ The `latest` tags always contain the **latest stable** version of WBCE with the 
 
 ## Configuration/Environment Variables
 
-If using a configured WBCE instance, e.g. when migrating from a standalone webserver, all configuration is in file `config.php` in document root.
+If using a configured WBCE instance, e.g. when migrating from a standalone webserver, all configuration already is in file `config.php` in document root.
 
 The following env variables **must** be set for initializing a brand new WBCE Docker instance:
 
@@ -43,6 +43,8 @@ More optional parameters are:
 `WBCE_LANGUAGE` - Language code. Defaults to `US`.
 
 `WBCE_ADMIN_EMAIL` - email address of admin user.
+
+The system defauts to german language. Change by setting `LANG` and `LC_ALL` to your locale setting.
 
 ## Database Connection
 
@@ -76,6 +78,13 @@ to share credentials across all instances. The following secrets are currently s
 
 Currently all images are configured to speak HTTP. To provide HTTPS please run an additional reverse proxy in front of them, which handles certificates and terminates TLS. Alternatively you could derive from our images to make Apache or nginx provide HTTPS – but please refrain from opening issues asking for support with such a setup.
 
+## Updating
+
+On start WBCE Docker will check if running an older version on WBCE. In this case the new sources will be fetched, extracted over the document root and the original update script `update.php` will be called. It ist **strongly recomended** to make a backup before running WBCE Docker over an older version of WBCE.
+
+## Migrating
+
+If migrating from other installations (e.g. standalone webserver)  you have to change `config.php` on you own so that WBCE can connect to the database. Make sure the the docker container can reach the SQL-System by configuring a network. If your Database runs on the host system, use `host.docker.internal` as database hostname.
 
 ## Examples
 
@@ -96,14 +105,11 @@ You can also create your own Docker image by extending from this image.
 
 # Caveats
 
-Upgrading of WBCE is currently not implemented and hopefully will come soon.
+The update process is not widely tested, so errors may occur. You a invited to make a contribution to this project to improve the update process (and any other process as well)
 
 # License
 
-This program is free software: you can redistribute it and/or modify it under the terms
-of the GNU General Public License as published by the Free Software Foundation, either
-version 3 of the License, or (at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+

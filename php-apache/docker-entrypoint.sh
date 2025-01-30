@@ -12,9 +12,83 @@ then
         INSTALLED_VERSION=$(php -r 'require "admin/interface/version.php"; echo WBCE_VERSION;')
         echo >&2 "Seeing installed WBCE Version ${INSTALLED_VERSION}"
 
-        # TODO: Check for necessary update and doit
+        # For now we can asume, that minor and patchlevel stay
+        # at one-digit values
+        if [ $(echo ${INSTALLED_VERSION} | tr -d .) -gt $( echo ${WBCE_VERSION} | tr -d .) ];
+        then
+            echo >&2 "Fatal error: Installed WBCE version is newer than"
+            echo >&2 "the one in this image: ${WBCE_VERSION}! Aborting."
+            exit
+        fi
 
+        if [ ${INSTALLED_VERSION} != ${WBCE_VERSION} ];
+        then
+            echo >&2 "Installing WBCE version ${WBCE_VERSION} over ${INSTALLED_VERSION}"
 
+            if [ ! -s wbce-update-exclude ];
+            then
+                echo <<EOF > wbce-update-exclude
+wbce/favicon.ico
+wbce/config.php.new
+EOF
+            fi
+
+            # Get sources from WBCE project
+            echo >&2 "Getting source for WBCE V${WBCE_VERSION} from official repository..."
+            wget -q https://github.com/WBCE/WBCE_CMS/archive/refs/tags/${WBCE_VERSION}.tar.gz -O /tmp/wbce.tar.gz
+
+            # Untar sources
+            echo >&2 "Extracting source..."
+            su www-data -s /bin/sh -c 'tar \
+                --strip-components=2 \
+                --exclude-from=wbce-update-exclude \
+                -zxf /tmp/wbce.tar.gz'
+
+            if [ -s wbce-update.patch ];
+            then
+                echo >&2 "Patching source using wbce-update.patch..."
+                patch  -p0 < wbce-update.patch
+            fi
+
+            # Run update.sh!
+            cat <<EOF > install/updatewrapper.php
+<?php
+\$_POST['backup_confirmed'] = 'confirmed';
+\$_POST['send'] = 'Start+update+script';
+require_once './update.php';
+EOF
+
+            # Get database host
+            DB_HOST=$(php -r 'require "config.php"; echo DB_HOST;')
+
+            /wait-for-it.sh -t 40 ${DB_HOST}:3306
+            result=$(su www-data -s /bin/sh -c 'cd install; /usr/local/bin/php ./updatewrapper.php')
+
+            if [ $(echo ${result} | grep -c Congratulations) -ne 1 ];
+            then
+
+                WB_URL=$(php -r 'require "config.php"; echo DB_HOST;')
+
+                echo >&2 "Fatal: Something went wrong. Please run"
+                echo >&2
+                echo >&2 " ${WB_URL}/install/update.php"
+                echo >&2
+                echo >&2 "manually!"
+            else
+
+                # Tidy up
+                echo >&2 "Deleting install directory"
+                rm -Rf install
+
+                echo >&2 "**********************************************"
+                echo >&2 "Complete: WBCE has been successfully updated"
+                echo >&2
+                echo >&2 "Please check, if everything is working"
+                echo >&2 "Also you maybe need to updates modules"
+                echo >&2 "**********************************************"
+
+            fi
+        fi
     else
 
         # Get sources from WBCE project
@@ -42,13 +116,15 @@ then
 
         if [ -z "${DATABASE_USERNAME}" -o -z "${DATABASE_PASSWORD}" ];
         then
+
             echo >&2 "**************************************************"
             echo >&2 "Complete: WBCE files have been successfully copied"
             echo >&2
             echo >&2 "You need to install WBCE via calling"
-            echo >&2 "   http://<yourhost>/admin/login/"
+            echo >&2 "   http[s]://<yourhost>/admin/login/"
             echo >&2
             echo >&2 "**************************************************"
+
         else
 
             # Prepare installation
@@ -116,9 +192,13 @@ EOF
             # This process will exit false of not successfull
             /wait-for-it.sh -t 40 mariadb:3306
             cd install; su www-data -s /bin/sh -c '/usr/local/bin/php ./initialize.php; exit $?'
-            
+
             result=$?
             [ ${result} -ne 0 ] && exit ${result}
+
+            # Tidy up
+            echo >&2 "Deleting install directory"
+            rm -Rf install
 
             echo >&2 "**********************************************"
             echo >&2 "Complete: WBCE has been successfully installed"
