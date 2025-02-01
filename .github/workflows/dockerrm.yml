@@ -3,12 +3,13 @@ name: Push README to Docker Hub
 permissions:
   contents: read
 
-on: push
-  branches:
-    - 'main'
-  paths:
-    - 'README.md'
-      
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'README.md'
+
 jobs:
   PushContainerReadme:
     runs-on: ubuntu-latest
