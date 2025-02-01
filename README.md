@@ -1,3 +1,5 @@
+Docker Hub users see https://github.com/bjalbor/wbce-docker for more information about this project.
+
 # Running WBCE in a Docker Container
 
 The simplest method is to run the *inofficial* image:
