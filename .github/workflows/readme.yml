@@ -1,0 +1,28 @@
+name: Push README to Docker Hub
+
+permissions:
+  contents: read
+
+on: push
+    branches:
+      - 'main'
+    paths:
+      - 'README.md'
+      
+jobs:
+  PushContainerReadme:
+    runs-on: ubuntu-latest
+    name: Push README to Docker Hub
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v2
+      - name: Push README to Dockerhub
+        uses: christian-korneck/update-container-description-action@v1
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+        with:
+          destination_container_repo: bjalbor/wbce
+          provider: dockerhub
+          short_description: 'Running WBCE in a Docker Container'
+          readme_file: 'README.md'
