@@ -39,4 +39,4 @@ jobs:
           context: php-apache
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: bjalbor/wbce-docker:latest,bjalbor/wbce-docker:1.6.3
+          tags: bjalbor/wbce:latest,bjalbor/wbce:1.6.3
