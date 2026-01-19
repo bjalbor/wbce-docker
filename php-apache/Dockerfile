@@ -1,8 +1,8 @@
-FROM php:8.1-apache
+FROM php:8.4-apache
 LABEL maintainer="Björn Bores <bjalbor@gmail.com>"
 LABEL org.opencontainers.image.source="https://github.com/bjalbor/wbce-docker"
 
-ENV WBCE_VERSION=1.6.4
+ENV WBCE_VERSION=1.6.5
 
 # Make sure, the upstream image is uptodate
 RUN apt-get update && apt-get -y upgrade && apt-get clean
