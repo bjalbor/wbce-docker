@@ -36,8 +36,8 @@ COPY save.patch /
 RUN a2enmod rewrite
 
 # Default to German
-ENV LC_ALL de_DE.UTF-8
-ENV LANG de_DE.UTF-8
+ENV LC_ALL=de_DE.UTF-8
+ENV LANG=de_DE.UTF-8
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
