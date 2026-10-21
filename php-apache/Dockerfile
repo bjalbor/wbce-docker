@@ -1,4 +1,5 @@
 FROM php:8.4-apache
+
 LABEL maintainer="Björn Bores <bjalbor@gmail.com>"
 LABEL org.opencontainers.image.source="https://github.com/bjalbor/wbce-docker"
 
